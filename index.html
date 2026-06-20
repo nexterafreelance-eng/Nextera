@@ -1,17 +1,43 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>NextEra Freelance</title>
+<title>NextEra Freelance - Level 4</title>
 
 <style>
-body{
+*{
 margin:0;
+padding:0;
+box-sizing:border-box;
 font-family:Arial, sans-serif;
-background:#0b1220;
+scroll-behavior:smooth;
+}
+
+body{
+background:#050814;
 color:white;
+overflow-x:hidden;
+}
+
+/* BACKGROUND ANIMATION */
+.bg{
+position:fixed;
+width:100%;
+height:100%;
+top:0;
+left:0;
+z-index:-1;
+background:linear-gradient(-45deg,#0b1220,#0f1b3d,#0a0f1f,#111a33);
+background-size:400% 400%;
+animation:gradient 12s ease infinite;
+}
+
+@keyframes gradient{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
 }
 
 /* HEADER */
@@ -19,28 +45,28 @@ header{
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:20px;
-background:#0f1a30;
+padding:20px 50px;
 position:sticky;
 top:0;
+background:rgba(0,0,0,0.4);
+backdrop-filter:blur(12px);
+border-bottom:1px solid rgba(255,255,255,0.08);
+z-index:100;
 }
 
 .logo{
-color:#38bdf8;
 font-size:22px;
 font-weight:bold;
-animation:float 3s infinite ease-in-out;
-}
-
-@keyframes float{
-0%,100%{transform:translateY(0);}
-50%{transform:translateY(-5px);}
+color:#38bdf8;
+letter-spacing:1px;
 }
 
 nav a{
-color:white;
-margin:0 10px;
+color:#cbd5e1;
+margin-left:20px;
 text-decoration:none;
+font-size:14px;
+transition:0.3s;
 }
 
 nav a:hover{
@@ -50,72 +76,95 @@ color:#38bdf8;
 /* HERO */
 .hero{
 text-align:center;
-padding:100px 20px;
-background:#0b1220;
+padding:120px 20px 80px;
 }
 
 .hero h1{
-font-size:40px;
+font-size:60px;
+font-weight:900;
+background:linear-gradient(90deg,#38bdf8,#6366f1,#22c55e);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
 }
 
 .hero p{
+margin-top:15px;
 color:#cbd5e1;
+font-size:16px;
 }
 
 /* BUTTON */
 .btn{
-padding:12px 20px;
-background:#38bdf8;
+margin-top:25px;
+padding:12px 26px;
+background:linear-gradient(90deg,#38bdf8,#6366f1);
 border:none;
-color:black;
-font-weight:bold;
-border-radius:8px;
-cursor:pointer;
-}
-
-.btn:hover{
-background:white;
-}
-
-/* SERVICES */
-.section{
-padding:60px 20px;
-text-align:center;
-}
-
-.cards{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:15px;
-margin-top:20px;
-}
-
-.card{
-background:#111c33;
-padding:20px;
 border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+color:black;
 transition:0.3s;
 }
 
-.card:hover{
+.btn:hover{
 transform:scale(1.05);
-background:#1a2a4a;
+}
+
+/* SECTIONS */
+.section{
+padding:80px 50px;
+text-align:center;
+}
+
+.section h2{
+font-size:32px;
+margin-bottom:30px;
+}
+
+/* CARDS */
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+}
+
+.card{
+background:rgba(255,255,255,0.06);
+border:1px solid rgba(255,255,255,0.1);
+padding:25px;
+border-radius:14px;
+transition:0.4s;
+backdrop-filter:blur(10px);
+opacity:0;
+transform:translateY(40px);
+}
+
+.card.show{
+opacity:1;
+transform:translateY(0);
+transition:0.6s ease;
+}
+
+.card:hover{
+transform:translateY(-10px) scale(1.02);
+border:1px solid #38bdf8;
 }
 
 /* CONTACT */
-.contact-box{
-max-width:500px;
-margin:auto;
-display:flex;
-flex-direction:column;
-gap:10px;
+.contact{
+text-align:center;
+padding:80px 20px;
 }
 
 input, textarea{
-padding:10px;
+width:80%;
+max-width:500px;
+padding:12px;
+margin:8px 0;
 border:none;
-border-radius:6px;
-outline:none;
+border-radius:8px;
+background:#111827;
+color:white;
 }
 
 textarea{
@@ -126,9 +175,10 @@ resize:none;
 /* FOOTER */
 footer{
 text-align:center;
-padding:20px;
-background:#0f1a30;
-margin-top:40px;
+padding:25px;
+background:#02030a;
+color:#94a3b8;
+border-top:1px solid rgba(255,255,255,0.08);
 }
 
 /* WHATSAPP */
@@ -139,15 +189,23 @@ right:20px;
 background:#25D366;
 padding:15px;
 border-radius:50%;
-text-decoration:none;
 color:white;
 font-size:20px;
+text-decoration:none;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+.hero h1{font-size:36px;}
+.section{padding:50px 20px;}
+header{flex-direction:column;}
 }
 </style>
-
 </head>
 
 <body>
+
+<div class="bg"></div>
 
 <header>
 <div class="logo">NextEra</div>
@@ -160,8 +218,8 @@ font-size:20px;
 
 <!-- HERO -->
 <section class="hero" id="home">
-<h1>AI & Language Services</h1>
-<p>Translation • Transcription • Data Entry • Subtitles • Dubbing</p>
+<h1>AI & Language Solutions</h1>
+<p>Translation • Transcription • Data Entry • Subtitles • Dubbing • Data Collection</p>
 <button class="btn">Get Started</button>
 </section>
 
@@ -183,16 +241,16 @@ font-size:20px;
 </section>
 
 <!-- CONTACT -->
-<section class="section" id="contact">
+<section class="contact" id="contact">
 <h2>Contact Us</h2>
 
 <p>Email: nexterafreelance@gmail.com</p>
 <p>WhatsApp: +92 370 7483188</p>
 
-<form class="contact-box" action="mailto:nexterafreelance@gmail.com" method="post">
-<input type="text" placeholder="Your Name" required>
-<input type="email" placeholder="Your Email" required>
-<textarea placeholder="Your Message" required></textarea>
+<form>
+<input type="text" placeholder="Your Name"><br>
+<input type="email" placeholder="Your Email"><br>
+<textarea placeholder="Message"></textarea><br>
 <button class="btn" type="submit">Send</button>
 </form>
 </section>
@@ -201,7 +259,21 @@ font-size:20px;
 © 2026 NextEra Freelance
 </footer>
 
-<a class="whatsapp" href="https://wa.me/923707483188" target="_blank">💬</a>
+<a class="whatsapp" href="https://wa.me/923707483188">💬</a>
+
+<script>
+/* scroll animation (no library needed) */
+const cards = document.querySelectorAll('.card');
+
+window.addEventListener('scroll', () => {
+cards.forEach(card => {
+const rect = card.getBoundingClientRect();
+if(rect.top < window.innerHeight - 100){
+card.classList.add('show');
+}
+});
+});
+</script>
 
 </body>
 </html>
