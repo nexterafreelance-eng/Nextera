@@ -22,12 +22,55 @@ const supabase = supabase.createClient(
   "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
 );
 </script>
+ <script>
+async function signup(){
+  let email = document.getElementById("email").value;
+  let password = document.getElementById("password").value;
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password
+  });
+
+  if(error){
+    alert(error.message);
+  } else {
+    alert("Signup successful!");
+  }
+}
+
+async function login(){
+  let email = document.getElementById("email").value;
+  let password = document.getElementById("password").value;
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    alert(error.message);
+  } else {
+    alert("Login successful!");
+    window.location.href = "dashboard.html";
+  }
+}
+</script> 
 body{
 background:#050814;
 color:white;
 overflow-x:hidden;
-}
+<h2>NextEra Login</h2>
 
+<input id="email" type="email" placeholder="Enter Email">
+<br><br>
+
+<input id="password" type="password" placeholder="Enter Password">
+<br><br>
+
+<button onclick="signup()">Sign Up</button>
+<button onclick="login()">Login</button>
+  }
 /* BACKGROUND ANIMATION */
 .bg{
 position:fixed;
