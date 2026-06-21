@@ -23,10 +23,6 @@ justify-content:space-between;
 align-items:center;
 }
 
-h2{
-margin:0;
-}
-
 .container{
 padding:20px;
 }
@@ -48,10 +44,6 @@ background:#38bdf8;
 color:black;
 font-weight:bold;
 }
-
-button:hover{
-background:#22c55e;
-}
 </style>
 </head>
 
@@ -65,8 +57,7 @@ background:#22c55e;
 <div class="container" id="projects"></div>
 
 <script>
-// Supabase connect
-const supabase = supabase.createClient(
+const client = supabase.createClient(
   "https://jnmjvjutyeruoowyrfgg.supabase.co",
   "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
 );
@@ -74,39 +65,46 @@ const supabase = supabase.createClient(
 let currentUser = null;
 let userRole = "";
 
-// GET USER
+/* ---------------- USER CHECK ---------------- */
 async function getUser(){
-const { data } = await supabase.auth.getUser();
-currentUser = data.user;
 
-if(!currentUser){
+const { data } = await client.auth.getUser();
+
+if(!data.user){
 window.location.href = "index.html";
 return;
 }
 
-getProfile();
-getProjects();
+currentUser = data.user;
+
+await getProfile();
+await getProjects();
 }
 
-// GET PROFILE (ROLE CHECK)
+/* ---------------- PROFILE ---------------- */
 async function getProfile(){
-const { data, error } = await supabase
+
+const { data, error } = await client
 .from("profiles")
 .select("*")
 .eq("id", currentUser.id)
 .single();
 
-if(data){
+if(error || !data){
+alert("Profile not found");
+window.location.href = "index.html";
+return;
+}
+
 userRole = data.role;
 }
-}
 
-// GET PROJECTS
+/* ---------------- PROJECTS ---------------- */
 async function getProjects(){
 
-const { data, error } = await supabase
-.from("projects")
-.select("*");
+const { data, error } = await client.from("projects").select("*");
+
+if(error) return;
 
 let box = document.getElementById("projects");
 box.innerHTML = "";
@@ -133,13 +131,11 @@ box.appendChild(div);
 
 }
 
-// INTEREST FUNCTION
+/* ---------------- INTEREST ---------------- */
 async function interest(project_id){
 
-const { error } = await supabase
-.from("interests")
-.insert([{
-project_id: project_id,
+const { error } = await client.from("interests").insert([{
+project_id,
 user_id: currentUser.id,
 user_email: currentUser.email,
 role: userRole
@@ -152,9 +148,9 @@ alert("Interest sent!");
 }
 }
 
-// LOGOUT
+/* ---------------- LOGOUT ---------------- */
 async function logout(){
-await supabase.auth.signOut();
+await client.auth.signOut();
 window.location.href = "index.html";
 }
 
