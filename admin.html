@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>NextEra Admin Panel - Level 12</title>
+<title>NextEra Admin Panel - Secure</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -23,9 +23,7 @@ justify-content:space-between;
 align-items:center;
 }
 
-.container{
-padding:20px;
-}
+.container{padding:20px;}
 
 .box{
 background:#111a33;
@@ -53,10 +51,6 @@ color:black;
 font-weight:bold;
 margin-top:5px;
 }
-
-button:hover{
-background:#22c55e;
-}
 </style>
 </head>
 
@@ -69,21 +63,17 @@ background:#22c55e;
 
 <div class="container">
 
-<!-- CREATE PROJECT -->
 <h3>➕ Create New Project</h3>
 <div class="box">
 <input id="title" placeholder="Project Title">
 <input id="description" placeholder="Project Description">
 <input id="budget" placeholder="Budget">
-
 <button onclick="createProject()">Post Project</button>
 </div>
 
-<!-- PROJECTS -->
 <h3>📌 Projects</h3>
 <div id="projects"></div>
 
-<!-- INTERESTS -->
 <h3>🔥 Interests</h3>
 <div id="interests"></div>
 
@@ -95,13 +85,37 @@ const client = supabase.createClient(
 "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
 );
 
-// LOAD EVERYTHING
+/* ---------------- SECURITY CHECK ---------------- */
+async function checkAdmin(){
+
+const { data: userData } = await client.auth.getUser();
+
+if(!userData.user){
+window.location.href = "index.html";
+return;
+}
+
+const { data: profile } = await client
+.from("profiles")
+.select("*")
+.eq("id", userData.user.id)
+.single();
+
+if(!profile || profile.role !== "admin"){
+alert("Access Denied!");
+window.location.href = "dashboard.html";
+}
+}
+
+checkAdmin();
+
+/* ---------------- LOAD ---------------- */
 async function load(){
 loadProjects();
 loadInterests();
 }
 
-// CREATE PROJECT
+/* ---------------- CREATE PROJECT ---------------- */
 async function createProject(){
 
 let title = document.getElementById("title").value;
@@ -120,7 +134,7 @@ load();
 }
 }
 
-// LOAD PROJECTS
+/* ---------------- PROJECTS ---------------- */
 async function loadProjects(){
 
 const { data } = await client.from("projects").select("*");
@@ -137,7 +151,6 @@ div.innerHTML = `
 <h4>${p.title}</h4>
 <p>${p.description}</p>
 <p><b>Budget:</b> ${p.budget}</p>
-
 <button onclick="deleteProject('${p.id}')">Delete</button>
 `;
 
@@ -145,23 +158,13 @@ box.appendChild(div);
 });
 }
 
-// DELETE PROJECT
 async function deleteProject(id){
 
-const { error } = await client
-.from("projects")
-.delete()
-.eq("id", id);
-
-if(error){
-alert(error.message);
-} else {
-alert("Deleted!");
+await client.from("projects").delete().eq("id", id);
 load();
 }
-}
 
-// LOAD INTERESTS
+/* ---------------- INTERESTS ---------------- */
 async function loadInterests(){
 
 const { data } = await client.from("interests").select("*");
@@ -188,26 +191,20 @@ box.appendChild(div);
 });
 }
 
-// ASSIGN WORK
+/* ---------------- ASSIGN WORK ---------------- */
 async function assignWork(project_id, user_id, role){
 
-const { error } = await client
-.from("assignments")
-.insert([{
+await client.from("assignments").insert([{
 project_id,
 assigned_to: user_id,
 assigned_role: role,
 status: "active"
 }]);
 
-if(error){
-alert(error.message);
-} else {
 alert("Work Assigned!");
 }
-}
 
-// LOGOUT
+/* ---------------- LOGOUT ---------------- */
 async function logout(){
 await client.auth.signOut();
 window.location.href = "index.html";
