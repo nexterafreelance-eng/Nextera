@@ -390,14 +390,14 @@ async function loadProjects(){
   const { data, error } = await client.from("projects").select("*").order("created_at", { ascending:false });
 
   if(error){
-    box.innerHTML = <div class="empty">Couldn't load projects: ${esc(error.message)}</div>;
+    box.innerHTML = `<div class="empty">Couldn't load projects: ${esc(error.message)}</div>`;
     return;
   }
 
   document.getElementById("projectCount").textContent = data.length;
 
   if(data.length === 0){
-    box.innerHTML = <div class="empty">No projects posted yet. Create one above.</div>;
+    box.innerHTML = `<div class="empty">No projects posted yet. Create one above.</div>`;
     return;
   }
 
@@ -449,14 +449,14 @@ async function loadInterests(){
   const { data, error } = await client.from("interests").select("*");
 
   if(error){
-    box.innerHTML = <div class="empty">Couldn't load interests: ${esc(error.message)}</div>;
+    box.innerHTML = `<div class="empty">Couldn't load interests: ${esc(error.message)}</div>`;
     return;
   }
 
   document.getElementById("interestCount").textContent = data.length;
 
   if(data.length === 0){
-    box.innerHTML = <div class="empty">No interests submitted yet.</div>;
+    box.innerHTML = `<div class="empty">No interests submitted yet.</div>`;
     return;
   }
 
@@ -492,7 +492,7 @@ async function loadInterests(){
       if(error){
         alert(error.message);
       } else {
-        b.outerHTML = <span class="budget-tag">Assigned ✓</span>;
+        b.outerHTML = `<span class="budget-tag">Assigned ✓</span>`;
       }
     });
   });
