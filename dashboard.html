@@ -281,14 +281,14 @@ async function getProjects(){
     .order("created_at", { ascending:false });
 
   if(error){
-    box.innerHTML = <div class="empty">Couldn't load projects: ${esc(error.message)}</div>;
+    box.innerHTML = `<div class="empty">Couldn't load projects: ${esc(error.message)}</div>`;
     return;
   }
 
   document.getElementById("projectCount").textContent = data.length;
 
   if(data.length === 0){
-    box.innerHTML = <div class="empty">No open projects right now. Check back soon.</div>;
+    box.innerHTML = `<div class="empty">No open projects right now. Check back soon.</div>`;
     return;
   }
 
@@ -345,7 +345,7 @@ async function sendInterest(btn, project_id){
   btn.classList.remove("loading");
   btn.classList.remove("btn-primary");
   btn.classList.add("btn-done");
-  btn.innerHTML = <span class="btn-text">Interest sent ✓</span>;
+  btn.innerHTML = `<span class="btn-text">Interest sent ✓</span>`;
   showBanner("success", "Your interest has been sent.");
 }
 
