@@ -82,7 +82,8 @@
 
   .section{ margin-bottom:34px; }
   .section-head{
-    display:flex; align-items:center; gap:8px; margin-bottom:14px;
+    display:flex; align-items:center; justify-content:between;
+    gap:8px; margin-bottom:14px;
   }
   .section-head h3{ font-size:16px; font-weight:700; }
   .count-pill{
@@ -303,12 +304,11 @@ function hideBanner(el){
   el.textContent = "";
 }
 
-/* ✅ FIXED: Redirects use "/" paths */
 async function checkAdminAndInit(){
   const { data: userData, error: userErr } = await client.auth.getUser();
 
   if(userErr || !userData.user){
-    window.location.href = "/";
+    window.location.href = "index.html";
     return;
   }
 
@@ -319,7 +319,7 @@ async function checkAdminAndInit(){
     .single();
 
   if(profileErr || !profile || profile.role !== "admin"){
-    window.location.href = "/dashboard";
+    window.location.href = "dashboard.html";
     return;
   }
 
@@ -498,10 +498,9 @@ async function loadInterests(){
   });
 }
 
-/* ✅ FIXED: Logout redirect to "/" */
 document.getElementById("logoutBtn").addEventListener("click", async ()=>{
   await client.auth.signOut();
-  window.location.href = "/";
+  window.location.href = "index.html";
 });
 
 ["title","description","budget"].forEach(id=>{
