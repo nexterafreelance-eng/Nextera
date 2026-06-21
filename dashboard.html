@@ -2,63 +2,204 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>NextEra Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>NextEra — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#0b1220;
-color:white;
-}
+  :root{
+    --bg:#0a0e1a;
+    --panel:#0e1426;
+    --card:#111a2e;
+    --field:#0b1120;
+    --border:#1f2a44;
+    --text:#e7ecf5;
+    --muted:#8b96ad;
+    --accent:#38bdf8;
+    --accent-2:#818cf8;
+    --error:#f87171;
+    --success:#34d399;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family:'Inter', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+  }
+  h1,h2,h3,h4{ font-family:'Sora', sans-serif; margin:0; }
 
-header{
-padding:15px;
-background:#111a33;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:10;
+    padding:16px 28px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{
+    width:32px; height:32px; border-radius:8px;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Sora'; font-weight:800; color:#06121f; font-size:14px;
+  }
+  .brand h2{ font-size:17px; font-weight:700; }
+  .brand span{ display:block; font-size:11.5px; color:var(--muted); font-weight:500; }
 
-.container{
-padding:20px;
-}
+  .header-right{ display:flex; align-items:center; gap:14px; }
+  .role-pill{
+    font-size:11.5px; font-weight:600; color:var(--accent);
+    background:rgba(56,189,248,.1); border:1px solid rgba(56,189,248,.25);
+    padding:4px 11px; border-radius:999px; text-transform:capitalize;
+  }
+  .logout-btn{
+    padding:9px 16px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text);
+    border-radius:8px;
+    font-family:'Inter'; font-weight:600; font-size:13px;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .logout-btn:hover{ border-color:var(--error); color:var(--error); }
 
-.card{
-background:#111a33;
-padding:15px;
-margin:10px 0;
-border-radius:10px;
-border:1px solid rgba(255,255,255,0.1);
-}
+  /* ---------- Layout ---------- */
+  .container{ max-width:900px; margin:0 auto; padding:28px 24px 60px; }
 
-button{
-padding:8px 12px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-background:#38bdf8;
-color:black;
-font-weight:bold;
-}
+  .gate{
+    display:flex; align-items:center; justify-content:center;
+    min-height:70vh; flex-direction:column; gap:10px; color:var(--muted);
+  }
+  .gate .spin{
+    width:26px; height:26px; border:3px solid var(--border);
+    border-top-color:var(--accent); border-radius:50%;
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .app{ display:none; }
+  .app.show{ display:block; }
+
+  .section-head{
+    display:flex; align-items:center; gap:8px; margin-bottom:14px;
+  }
+  .section-head h3{ font-size:16px; font-weight:700; }
+  .count-pill{
+    font-size:11.5px; color:var(--muted); background:var(--field);
+    border:1px solid var(--border); padding:2px 9px; border-radius:999px;
+  }
+
+  .banner{
+    display:none; font-size:13px; padding:10px 12px;
+    border-radius:9px; margin-bottom:16px; line-height:1.4;
+  }
+  .banner.show{ display:block; }
+  .banner.error{ background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#fca5a5; }
+  .banner.success{ background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.3); color:#6ee7b7; }
+
+  /* ---------- Project cards ---------- */
+  .list{ display:flex; flex-direction:column; gap:12px; }
+  .card{
+    background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:18px 20px;
+  }
+  .card h4{ font-size:15px; font-weight:700; margin-bottom:6px; }
+  .card p{ font-size:13.5px; color:var(--muted); margin:2px 0; line-height:1.55; }
+  .card-foot{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:12px; flex-wrap:wrap; gap:10px;
+  }
+  .budget-tag{
+    font-size:12.5px; font-weight:700; color:var(--accent);
+    background:rgba(56,189,248,.1); padding:3px 10px; border-radius:999px;
+  }
+
+  .btn{
+    padding:9px 16px; border:none; border-radius:9px;
+    font-family:'Inter'; font-weight:700; font-size:13px;
+    cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+    transition:opacity .15s ease, transform .1s ease;
+  }
+  .btn:active{ transform:scale(.98); }
+  .btn-primary{ background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#06121f; }
+  .btn-primary:hover{ opacity:.92; }
+  .btn-primary:disabled{ opacity:.55; cursor:not-allowed; }
+  .btn-done{
+    background:rgba(52,211,153,.12); color:#6ee7b7;
+    border:1px solid rgba(52,211,153,.3); cursor:default;
+  }
+
+  .spinner-sm{
+    width:13px; height:13px; border:2px solid rgba(6,18,31,.3);
+    border-top-color:#06121f; border-radius:50%;
+    animation:spin .7s linear infinite; display:none;
+  }
+  .btn.loading .spinner-sm{ display:inline-block; }
+  .btn.loading .btn-text{ display:none; }
+
+  .empty{
+    text-align:center; padding:34px 14px; color:var(--muted); font-size:13.5px;
+    border:1px dashed var(--border); border-radius:12px;
+  }
+
+  @media (max-width:600px){
+    header{ padding:14px 18px; }
+    .container{ padding:22px 16px 50px; }
+  }
+
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
 </style>
 </head>
 
 <body>
 
 <header>
-<h2>NextEra Dashboard</h2>
-<button onclick="logout()">Logout</button>
+  <div class="brand">
+    <div class="logo-mark">NE</div>
+    <div>
+      <h2>NextEra</h2>
+      <span id="welcomeText">Dashboard</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="role-pill" id="rolePill"></span>
+    <button class="logout-btn" id="logoutBtn">Log out</button>
+  </div>
 </header>
 
-<div class="container" id="projects"></div>
+<div class="container">
+
+  <!-- Auth gate -->
+  <div class="gate" id="gate">
+    <div class="spin"></div>
+    <p>Loading your dashboard…</p>
+  </div>
+
+  <!-- Main app, hidden until user verified -->
+  <div class="app" id="app">
+
+    <div class="banner" id="banner"></div>
+
+    <div class="section-head">
+      <h3>Open projects</h3>
+      <span class="count-pill" id="projectCount">0</span>
+    </div>
+    <div class="list" id="projects"></div>
+
+  </div>
+</div>
 
 <script>
-
-/* ---------------- SUPABASE ---------------- */
 const client = supabase.createClient(
   "https://jnmjvjutyeruoowyrfgg.supabase.co",
   "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
@@ -67,103 +208,152 @@ const client = supabase.createClient(
 let currentUser = null;
 let userRole = "";
 
-/* ---------------- START APP ---------------- */
-document.addEventListener("DOMContentLoaded", () => {
-getUser();
-});
+/* ---------- Escape helper (fixes XSS) ---------- */
+function esc(str){
+  return String(str ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[c]));
+}
 
-/* ---------------- GET USER ---------------- */
+function showBanner(type, msg){
+  const el = document.getElementById("banner");
+  el.className = "banner show " + type;
+  el.textContent = msg;
+}
+
+/* ---------- START APP ---------- */
+document.addEventListener("DOMContentLoaded", getUser);
+
+/* ---------- GET USER + GATE ---------- */
 async function getUser(){
+  const { data, error } = await client.auth.getUser();
 
-const { data: { user }, error } = await client.auth.getUser();
+  if(error || !data.user){
+    window.location.href = "index.html";
+    return;
+  }
 
-if(error || !user){
-window.location.href = "index.html";
-return;
+  currentUser = data.user;
+
+  const ok = await getProfile();
+  if(!ok) return;
+
+  document.getElementById("gate").style.display = "none";
+  document.getElementById("app").classList.add("show");
+
+  await getProjects();
 }
 
-currentUser = user;
-
-await getProfile();
-await getProjects();
-}
-
-/* ---------------- GET PROFILE ---------------- */
+/* ---------- GET PROFILE ---------- */
 async function getProfile(){
+  const { data, error } = await client
+    .from("profiles")
+    .select("*")
+    .eq("id", currentUser.id)
+    .single();
 
-const { data, error } = await client
-.from("profiles")
-.select("*")
-.eq("id", currentUser.id)
-.single();
+  if(error || !data){
+    window.location.href = "index.html";
+    return false;
+  }
 
-if(error || !data){
-alert("Profile not found!");
-window.location.href = "index.html";
-return;
+  userRole = data.role;
+
+  document.getElementById("welcomeText").textContent =
+    "Welcome back" + (data.name ? ", " + data.name : "");
+  const pill = document.getElementById("rolePill");
+  pill.textContent = userRole.replace("_", " ");
+
+  if(userRole === "admin"){
+    window.location.href = "admin.html";
+    return false;
+  }
+
+  return true;
 }
 
-userRole = data.role;
-}
-
-/* ---------------- LOAD PROJECTS ---------------- */
+/* ---------- LOAD PROJECTS ---------- */
 async function getProjects(){
+  const box = document.getElementById("projects");
+  const { data, error } = await client
+    .from("projects")
+    .select("*")
+    .order("created_at", { ascending:false });
 
-const { data, error } = await client.from("projects").select("*");
+  if(error){
+    box.innerHTML = <div class="empty">Couldn't load projects: ${esc(error.message)}</div>;
+    return;
+  }
 
-if(error){
-alert("Error loading projects");
-return;
+  document.getElementById("projectCount").textContent = data.length;
+
+  if(data.length === 0){
+    box.innerHTML = <div class="empty">No open projects right now. Check back soon.</div>;
+    return;
+  }
+
+  box.innerHTML = "";
+  data.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    let actionHtml = "";
+    if(userRole === "freelancer" || userRole === "team_leader"){
+      actionHtml = `
+        <button class="btn btn-primary" data-interest-id="${esc(p.id)}">
+          <span class="spinner-sm"></span>
+          <span class="btn-text">I'm interested</span>
+        </button>
+      `;
+    }
+
+    div.innerHTML = `
+      <h4>${esc(p.title)}</h4>
+      <p>${esc(p.description)}</p>
+      <div class="card-foot">
+        <span class="budget-tag">$${esc(p.budget)}</span>
+        ${actionHtml}
+      </div>
+    `;
+    box.appendChild(div);
+  });
+
+  box.querySelectorAll("[data-interest-id]").forEach(btn=>{
+    btn.addEventListener("click", ()=> sendInterest(btn, btn.getAttribute("data-interest-id")));
+  });
 }
 
-let box = document.getElementById("projects");
-box.innerHTML = "";
+/* ---------- INTEREST (fixed: prevents double-click + shows inline state) ---------- */
+async function sendInterest(btn, project_id){
+  btn.classList.add("loading");
+  btn.disabled = true;
 
-data.forEach(p => {
+  const { error } = await client.from("interests").insert([{
+    project_id,
+    user_id: currentUser.id,
+    user_email: currentUser.email,
+    role: userRole
+  }]);
 
-let div = document.createElement("div");
-div.className = "card";
+  if(error){
+    btn.classList.remove("loading");
+    btn.disabled = false;
+    showBanner("error", error.message);
+    return;
+  }
 
-div.innerHTML = `
-<h3>${p.title}</h3>
-<p>${p.description}</p>
-<p><b>Budget:</b> ${p.budget}</p>
-`;
-
-if(userRole === "freelancer" || userRole === "team_leader"){
-div.innerHTML += `
-<button onclick="interest('${p.id}')">I'm Interested</button>
-`;
+  btn.classList.remove("loading");
+  btn.classList.remove("btn-primary");
+  btn.classList.add("btn-done");
+  btn.innerHTML = <span class="btn-text">Interest sent ✓</span>;
+  showBanner("success", "Your interest has been sent.");
 }
 
-box.appendChild(div);
+/* ---------- LOGOUT ---------- */
+document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+  await client.auth.signOut();
+  window.location.href = "index.html";
 });
-
-}
-
-/* ---------------- INTEREST ---------------- */
-async function interest(project_id){
-
-const { error } = await client.from("interests").insert([{
-project_id,
-user_id: currentUser.id,
-user_email: currentUser.email,
-role: userRole
-}]);
-
-if(error){
-alert(error.message);
-} else {
-alert("Interest sent!");
-}
-}
-
-/* ---------------- LOGOUT ---------------- */
-async function logout(){
-await client.auth.signOut();
-window.location.href = "index.html";
-}
-
 </script>
 
 </body>
