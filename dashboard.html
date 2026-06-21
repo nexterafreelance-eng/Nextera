@@ -33,6 +33,7 @@
   }
   h1,h2,h3,h4{ font-family:'Sora', sans-serif; margin:0; }
 
+  /* ---------- Header ---------- */
   header{
     position:sticky; top:0; z-index:10;
     padding:16px 28px;
@@ -72,6 +73,7 @@
   }
   .logout-btn:hover{ border-color:var(--error); color:var(--error); }
 
+  /* ---------- Layout ---------- */
   .container{ max-width:900px; margin:0 auto; padding:28px 24px 60px; }
 
   .gate{
@@ -105,6 +107,7 @@
   .banner.error{ background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#fca5a5; }
   .banner.success{ background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.3); color:#6ee7b7; }
 
+  /* ---------- Project cards ---------- */
   .list{ display:flex; flex-direction:column; gap:12px; }
   .card{
     background:var(--card); border:1px solid var(--border);
@@ -176,11 +179,13 @@
 
 <div class="container">
 
+  <!-- Auth gate -->
   <div class="gate" id="gate">
     <div class="spin"></div>
     <p>Loading your dashboard…</p>
   </div>
 
+  <!-- Main app, hidden until user verified -->
   <div class="app" id="app">
 
     <div class="banner" id="banner"></div>
@@ -203,6 +208,7 @@ const client = supabase.createClient(
 let currentUser = null;
 let userRole = "";
 
+/* ---------- Escape helper (fixes XSS) ---------- */
 function esc(str){
   return String(str ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
@@ -215,14 +221,15 @@ function showBanner(type, msg){
   el.textContent = msg;
 }
 
+/* ---------- START APP ---------- */
 document.addEventListener("DOMContentLoaded", getUser);
 
-/* ✅ FIXED: Redirects use "/" paths */
+/* ---------- GET USER + GATE ---------- */
 async function getUser(){
   const { data, error } = await client.auth.getUser();
 
   if(error || !data.user){
-    window.location.href = "/";
+    window.location.href = "index.html";
     return;
   }
 
@@ -237,6 +244,7 @@ async function getUser(){
   await getProjects();
 }
 
+/* ---------- GET PROFILE ---------- */
 async function getProfile(){
   const { data, error } = await client
     .from("profiles")
@@ -245,7 +253,7 @@ async function getProfile(){
     .single();
 
   if(error || !data){
-    window.location.href = "/";
+    window.location.href = "index.html";
     return false;
   }
 
@@ -256,15 +264,15 @@ async function getProfile(){
   const pill = document.getElementById("rolePill");
   pill.textContent = userRole.replace("_", " ");
 
-  /* ✅ FIXED: Redirect to /admin not admin.html */
   if(userRole === "admin"){
-    window.location.href = "/admin";
+    window.location.href = "admin.html";
     return false;
   }
 
   return true;
 }
 
+/* ---------- LOAD PROJECTS ---------- */
 async function getProjects(){
   const box = document.getElementById("projects");
   const { data, error } = await client
@@ -315,6 +323,7 @@ async function getProjects(){
   });
 }
 
+/* ---------- INTEREST (fixed: prevents double-click + shows inline state) ---------- */
 async function sendInterest(btn, project_id){
   btn.classList.add("loading");
   btn.disabled = true;
@@ -340,10 +349,10 @@ async function sendInterest(btn, project_id){
   showBanner("success", "Your interest has been sent.");
 }
 
-/* ✅ FIXED: Logout redirect to "/" */
+/* ---------- LOGOUT ---------- */
 document.getElementById("logoutBtn").addEventListener("click", async ()=>{
   await client.auth.signOut();
-  window.location.href = "/";
+  window.location.href = "index.html";
 });
 </script>
 
