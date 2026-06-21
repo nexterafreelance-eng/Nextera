@@ -24,7 +24,6 @@ background:#111a33;
 padding:25px;
 border-radius:12px;
 width:320px;
-box-shadow:0 0 20px rgba(0,0,0,0.4);
 }
 
 input, select{
@@ -46,13 +45,6 @@ color:black;
 font-weight:bold;
 cursor:pointer;
 }
-
-button:hover{
-background:#22c55e;
-}
-h2{
-text-align:center;
-}
 </style>
 </head>
 
@@ -69,10 +61,10 @@ text-align:center;
 <option value="client">Client</option>
 <option value="freelancer">Freelancer</option>
 <option value="team_leader">Team Leader</option>
+<option value="admin">Admin</option>
 </select>
 
 <input id="contact" type="text" placeholder="Contact Number">
-
 <input id="native" type="text" placeholder="Native Status (yes/no)">
 
 <button onclick="signup()">Sign Up</button>
@@ -80,7 +72,7 @@ text-align:center;
 </div>
 
 <script>
-const supabase = supabase.createClient(
+const client = supabase.createClient(
   "https://jnmjvjutyeruoowyrfgg.supabase.co",
   "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
 );
@@ -95,7 +87,7 @@ let role = document.getElementById("role").value;
 let contact = document.getElementById("contact").value;
 let native = document.getElementById("native").value;
 
-const { data, error } = await supabase.auth.signUp({
+const { data, error } = await client.auth.signUp({
 email,
 password
 });
@@ -105,46 +97,50 @@ alert(error.message);
 return;
 }
 
-// Save profile in DB
 const user = data.user;
 
-const { error: dbError } = await supabase
-.from("profiles")
-.insert([
-{
+await client.from("profiles").insert([{
 id: user.id,
-email: email,
-name: name,
-role: role,
+email,
+name,
+role,
 contact_number: contact,
 native_status: native
-}
-]);
+}]);
 
-if(dbError){
-alert(dbError.message);
-} else {
 alert("Signup successful!");
 }
-}
 
-// LOGIN
+// LOGIN (FIXED)
 async function login(){
 
 let email = document.getElementById("email").value;
 let password = document.getElementById("password").value;
 
-const { error } = await supabase.auth.signInWithPassword({
+const { data, error } = await client.auth.signInWithPassword({
 email,
 password
 });
 
 if(error){
 alert(error.message);
-} else {
-alert("Login successful! Redirecting...");
+return;
+}
+
+// PROFILE CHECK
+const { data: profile } = await client
+.from("profiles")
+.select("*")
+.eq("id", data.user.id)
+.single();
+
+if(profile.role === "admin"){
+window.location.href = "admin.html";
+}
+else{
 window.location.href = "dashboard.html";
 }
+
 }
 </script>
 
