@@ -1,1 +1,165 @@
-</h1>Dashboard</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NextEra Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#0b1220;
+color:white;
+}
+
+header{
+padding:15px;
+background:#111a33;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+h2{
+margin:0;
+}
+
+.container{
+padding:20px;
+}
+
+.card{
+background:#111a33;
+padding:15px;
+margin:10px 0;
+border-radius:10px;
+border:1px solid rgba(255,255,255,0.1);
+}
+
+button{
+padding:8px 12px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:#38bdf8;
+color:black;
+font-weight:bold;
+}
+
+button:hover{
+background:#22c55e;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>NextEra Dashboard</h2>
+<button onclick="logout()">Logout</button>
+</header>
+
+<div class="container" id="projects"></div>
+
+<script>
+// Supabase connect
+const supabase = supabase.createClient(
+  "https://jnmjvjutyeruoowyrfgg.supabase.co",
+  "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
+);
+
+let currentUser = null;
+let userRole = "";
+
+// GET USER
+async function getUser(){
+const { data } = await supabase.auth.getUser();
+currentUser = data.user;
+
+if(!currentUser){
+window.location.href = "index.html";
+return;
+}
+
+getProfile();
+getProjects();
+}
+
+// GET PROFILE (ROLE CHECK)
+async function getProfile(){
+const { data, error } = await supabase
+.from("profiles")
+.select("*")
+.eq("id", currentUser.id)
+.single();
+
+if(data){
+userRole = data.role;
+}
+}
+
+// GET PROJECTS
+async function getProjects(){
+
+const { data, error } = await supabase
+.from("projects")
+.select("*");
+
+let box = document.getElementById("projects");
+box.innerHTML = "";
+
+data.forEach(p => {
+
+let div = document.createElement("div");
+div.className = "card";
+
+div.innerHTML = `
+<h3>${p.title}</h3>
+<p>${p.description}</p>
+<p><b>Budget:</b> ${p.budget}</p>
+`;
+
+if(userRole === "freelancer" || userRole === "team_leader"){
+div.innerHTML += `
+<button onclick="interest('${p.id}')">I'm Interested</button>
+`;
+}
+
+box.appendChild(div);
+});
+
+}
+
+// INTEREST FUNCTION
+async function interest(project_id){
+
+const { error } = await supabase
+.from("interests")
+.insert([{
+project_id: project_id,
+user_id: currentUser.id,
+user_email: currentUser.email,
+role: userRole
+}]);
+
+if(error){
+alert(error.message);
+} else {
+alert("Interest sent!");
+}
+}
+
+// LOGOUT
+async function logout(){
+await supabase.auth.signOut();
+window.location.href = "index.html";
+}
+
+getUser();
+</script>
+
+</body>
+</html>
