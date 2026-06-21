@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NextEra Level 12 - Secure Login</title>
+<title>NextEra Login</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -45,14 +45,6 @@ color:black;
 font-weight:bold;
 cursor:pointer;
 }
-
-button:hover{
-background:#22c55e;
-}
-
-h2{
-text-align:center;
-}
 </style>
 </head>
 
@@ -65,7 +57,6 @@ text-align:center;
 <input id="email" type="email" placeholder="Email">
 <input id="password" type="password" placeholder="Password">
 
-<!-- ONLY NORMAL USERS -->
 <select id="role">
 <option value="client">Client</option>
 <option value="freelancer">Freelancer</option>
@@ -73,7 +64,7 @@ text-align:center;
 </select>
 
 <input id="contact" type="text" placeholder="Contact Number">
-<input id="native" type="text" placeholder="Native Status (yes/no)">
+<input id="native" type="text" placeholder="Native (yes/no)">
 
 <button onclick="signup()">Sign Up</button>
 <button onclick="login()">Login</button>
@@ -85,15 +76,15 @@ const client = supabase.createClient(
   "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
 );
 
-/* ---------------- SIGNUP ---------------- */
+/* SIGNUP */
 async function signup(){
 
-let name = document.getElementById("name").value;
-let email = document.getElementById("email").value;
-let password = document.getElementById("password").value;
-let role = document.getElementById("role").value;
-let contact = document.getElementById("contact").value;
-let native = document.getElementById("native").value;
+const email = document.getElementById("email").value;
+const password = document.getElementById("password").value;
+const name = document.getElementById("name").value;
+const role = document.getElementById("role").value;
+const contact = document.getElementById("contact").value;
+const native = document.getElementById("native").value;
 
 const { data, error } = await client.auth.signUp({
 email,
@@ -105,10 +96,8 @@ alert(error.message);
 return;
 }
 
-const user = data.user;
-
-const { error: dbError } = await client.from("profiles").insert([{
-id: user.id,
+await client.from("profiles").insert([{
+id: data.user.id,
 email,
 name,
 role,
@@ -116,18 +105,14 @@ contact_number: contact,
 native_status: native
 }]);
 
-if(dbError){
-alert(dbError.message);
-} else {
 alert("Signup successful!");
 }
-}
 
-/* ---------------- LOGIN ---------------- */
+/* LOGIN */
 async function login(){
 
-let email = document.getElementById("email").value;
-let password = document.getElementById("password").value;
+const email = document.getElementById("email").value;
+const password = document.getElementById("password").value;
 
 const { data, error } = await client.auth.signInWithPassword({
 email,
@@ -139,14 +124,17 @@ alert(error.message);
 return;
 }
 
-/* GET PROFILE */
 const { data: profile } = await client
 .from("profiles")
 .select("*")
 .eq("id", data.user.id)
 .single();
 
-/* ROLE BASED REDIRECT */
+if(!profile){
+alert("Profile not found");
+return;
+}
+
 if(profile.role === "admin"){
 window.location.href = "admin.html";
 }
