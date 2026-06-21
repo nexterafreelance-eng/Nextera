@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NextEra Level 12 - Login System</title>
+<title>NextEra Level 12 - Secure Login</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -45,6 +45,14 @@ color:black;
 font-weight:bold;
 cursor:pointer;
 }
+
+button:hover{
+background:#22c55e;
+}
+
+h2{
+text-align:center;
+}
 </style>
 </head>
 
@@ -57,11 +65,11 @@ cursor:pointer;
 <input id="email" type="email" placeholder="Email">
 <input id="password" type="password" placeholder="Password">
 
+<!-- ONLY NORMAL USERS -->
 <select id="role">
 <option value="client">Client</option>
 <option value="freelancer">Freelancer</option>
 <option value="team_leader">Team Leader</option>
-<option value="admin">Admin</option>
 </select>
 
 <input id="contact" type="text" placeholder="Contact Number">
@@ -77,7 +85,7 @@ const client = supabase.createClient(
   "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
 );
 
-// SIGNUP
+/* ---------------- SIGNUP ---------------- */
 async function signup(){
 
 let name = document.getElementById("name").value;
@@ -99,7 +107,7 @@ return;
 
 const user = data.user;
 
-await client.from("profiles").insert([{
+const { error: dbError } = await client.from("profiles").insert([{
 id: user.id,
 email,
 name,
@@ -108,10 +116,14 @@ contact_number: contact,
 native_status: native
 }]);
 
+if(dbError){
+alert(dbError.message);
+} else {
 alert("Signup successful!");
 }
+}
 
-// LOGIN (FIXED)
+/* ---------------- LOGIN ---------------- */
 async function login(){
 
 let email = document.getElementById("email").value;
@@ -127,20 +139,20 @@ alert(error.message);
 return;
 }
 
-// PROFILE CHECK
+/* GET PROFILE */
 const { data: profile } = await client
 .from("profiles")
 .select("*")
 .eq("id", data.user.id)
 .single();
 
+/* ROLE BASED REDIRECT */
 if(profile.role === "admin"){
 window.location.href = "admin.html";
 }
 else{
 window.location.href = "dashboard.html";
 }
-
 }
 </script>
 
