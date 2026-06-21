@@ -57,6 +57,8 @@ font-weight:bold;
 <div class="container" id="projects"></div>
 
 <script>
+
+/* ---------------- SUPABASE ---------------- */
 const client = supabase.createClient(
   "https://jnmjvjutyeruoowyrfgg.supabase.co",
   "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
@@ -65,23 +67,28 @@ const client = supabase.createClient(
 let currentUser = null;
 let userRole = "";
 
-/* ---------------- USER CHECK ---------------- */
+/* ---------------- START APP ---------------- */
+document.addEventListener("DOMContentLoaded", () => {
+getUser();
+});
+
+/* ---------------- GET USER ---------------- */
 async function getUser(){
 
-const { data } = await client.auth.getUser();
+const { data: { user }, error } = await client.auth.getUser();
 
-if(!data.user){
+if(error || !user){
 window.location.href = "index.html";
 return;
 }
 
-currentUser = data.user;
+currentUser = user;
 
 await getProfile();
 await getProjects();
 }
 
-/* ---------------- PROFILE ---------------- */
+/* ---------------- GET PROFILE ---------------- */
 async function getProfile(){
 
 const { data, error } = await client
@@ -91,7 +98,7 @@ const { data, error } = await client
 .single();
 
 if(error || !data){
-alert("Profile not found");
+alert("Profile not found!");
 window.location.href = "index.html";
 return;
 }
@@ -99,12 +106,15 @@ return;
 userRole = data.role;
 }
 
-/* ---------------- PROJECTS ---------------- */
+/* ---------------- LOAD PROJECTS ---------------- */
 async function getProjects(){
 
 const { data, error } = await client.from("projects").select("*");
 
-if(error) return;
+if(error){
+alert("Error loading projects");
+return;
+}
 
 let box = document.getElementById("projects");
 box.innerHTML = "";
@@ -154,7 +164,6 @@ await client.auth.signOut();
 window.location.href = "index.html";
 }
 
-getUser();
 </script>
 
 </body>
