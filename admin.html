@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>NextEra Admin Panel</title>
+<title>NextEra Admin Panel - Level 12</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -35,6 +35,14 @@ border-radius:10px;
 border:1px solid rgba(255,255,255,0.1);
 }
 
+input{
+width:100%;
+padding:10px;
+margin:5px 0;
+border:none;
+border-radius:6px;
+}
+
 button{
 padding:8px 12px;
 border:none;
@@ -49,47 +57,73 @@ margin-top:5px;
 button:hover{
 background:#22c55e;
 }
-
-h3{
-margin:0 0 10px 0;
-}
 </style>
 </head>
 
 <body>
 
 <header>
-<h2>Admin Panel</h2>
+<h2>Admin Dashboard</h2>
 <button onclick="logout()">Logout</button>
 </header>
 
 <div class="container">
 
+<!-- CREATE PROJECT -->
+<h3>➕ Create New Project</h3>
+<div class="box">
+<input id="title" placeholder="Project Title">
+<input id="description" placeholder="Project Description">
+<input id="budget" placeholder="Budget">
+
+<button onclick="createProject()">Post Project</button>
+</div>
+
+<!-- PROJECTS -->
 <h3>📌 Projects</h3>
 <div id="projects"></div>
 
+<!-- INTERESTS -->
 <h3>🔥 Interests</h3>
 <div id="interests"></div>
 
 </div>
 
 <script>
-// Supabase connect
-const supabase = supabase.createClient(
-  "https://jnmjvjutyeruoowyrfgg.supabase.co",
-  "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
+const client = supabase.createClient(
+"https://jnmjvjutyeruoowyrfgg.supabase.co",
+"sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
 );
 
-// LOAD DATA
-async function loadData(){
+// LOAD EVERYTHING
+async function load(){
 loadProjects();
 loadInterests();
 }
 
-// PROJECTS
+// CREATE PROJECT
+async function createProject(){
+
+let title = document.getElementById("title").value;
+let description = document.getElementById("description").value;
+let budget = document.getElementById("budget").value;
+
+const { error } = await client
+.from("projects")
+.insert([{ title, description, budget }]);
+
+if(error){
+alert(error.message);
+} else {
+alert("Project Created!");
+load();
+}
+}
+
+// LOAD PROJECTS
 async function loadProjects(){
 
-const { data } = await supabase.from("projects").select("*");
+const { data } = await client.from("projects").select("*");
 
 let box = document.getElementById("projects");
 box.innerHTML = "";
@@ -102,17 +136,35 @@ div.className = "box";
 div.innerHTML = `
 <h4>${p.title}</h4>
 <p>${p.description}</p>
-<p>Budget: ${p.budget}</p>
+<p><b>Budget:</b> ${p.budget}</p>
+
+<button onclick="deleteProject('${p.id}')">Delete</button>
 `;
 
 box.appendChild(div);
 });
 }
 
-// INTERESTS
+// DELETE PROJECT
+async function deleteProject(id){
+
+const { error } = await client
+.from("projects")
+.delete()
+.eq("id", id);
+
+if(error){
+alert(error.message);
+} else {
+alert("Deleted!");
+load();
+}
+}
+
+// LOAD INTERESTS
 async function loadInterests(){
 
-const { data } = await supabase.from("interests").select("*");
+const { data } = await client.from("interests").select("*");
 
 let box = document.getElementById("interests");
 box.innerHTML = "";
@@ -127,7 +179,7 @@ div.innerHTML = `
 <p><b>Role:</b> ${i.role}</p>
 <p><b>Project ID:</b> ${i.project_id}</p>
 
-<button onclick="assign('${i.project_id}','${i.user_id}','${i.role}')">
+<button onclick="assignWork('${i.project_id}','${i.user_id}','${i.role}')">
 Assign Work
 </button>
 `;
@@ -137,12 +189,12 @@ box.appendChild(div);
 }
 
 // ASSIGN WORK
-async function assign(project_id, user_id, role){
+async function assignWork(project_id, user_id, role){
 
-const { error } = await supabase
+const { error } = await client
 .from("assignments")
 .insert([{
-project_id: project_id,
+project_id,
 assigned_to: user_id,
 assigned_role: role,
 status: "active"
@@ -153,3 +205,16 @@ alert(error.message);
 } else {
 alert("Work Assigned!");
 }
+}
+
+// LOGOUT
+async function logout(){
+await client.auth.signOut();
+window.location.href = "index.html";
+}
+
+load();
+</script>
+
+</body>
+</html>
