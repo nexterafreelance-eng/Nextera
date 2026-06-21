@@ -42,6 +42,7 @@
 
   h1,h2,h3{ font-family:'Sora', 'Inter', sans-serif; margin:0; }
 
+  /* ---------- Shell ---------- */
   .shell{
     width:100%;
     max-width:900px;
@@ -55,6 +56,7 @@
     box-shadow:0 30px 80px -20px rgba(0,0,0,.6);
   }
 
+  /* ---------- Brand panel ---------- */
   .brand{
     position:relative;
     padding:48px 40px;
@@ -151,6 +153,7 @@
     border-radius:999px;
   }
 
+  /* ---------- Form panel ---------- */
   .panel{
     padding:44px 40px;
     display:flex;
@@ -370,6 +373,7 @@
 
 <div class="shell">
 
+  <!-- Brand panel -->
   <div class="brand">
     <div class="orb"></div>
     <div class="logo">
@@ -387,6 +391,7 @@
     </div>
   </div>
 
+  <!-- Form panel -->
   <div class="panel">
 
     <div class="tabs" id="tabs">
@@ -586,7 +591,7 @@ function setLoading(btn, loading){
   btn.disabled = loading;
 }
 
-/* ✅ FIXED: Login redirect uses "/" paths */
+/* ---------- LOGIN ---------- */
 document.getElementById("loginBtn").addEventListener("click", async ()=>{
   hideBanner();
   const email = document.getElementById("loginEmail").value.trim();
@@ -623,9 +628,7 @@ document.getElementById("loginBtn").addEventListener("click", async ()=>{
   }
 
   showBanner("success", "Logged in. Redirecting…");
-  
-  /* ✅ FIXED: Use / paths instead of .html */
-  window.location.href = profile.role === "admin" ? "/admin" : "/dashboard";
+  window.location.href = profile.role === "admin" ? "admin.html" : "dashboard.html";
 });
 
 /* ---------- SIGNUP ---------- */
