@@ -33,7 +33,6 @@
   }
   h1,h2,h3,h4{ font-family:'Sora', sans-serif; margin:0; }
 
-  /* ---------- Header ---------- */
   header{
     position:sticky; top:0; z-index:10;
     padding:16px 28px;
@@ -65,7 +64,6 @@
   }
   .logout-btn:hover{ border-color:var(--error); color:var(--error); }
 
-  /* ---------- Layout ---------- */
   .container{ max-width:1000px; margin:0 auto; padding:28px 24px 60px; }
 
   .gate{
@@ -84,8 +82,7 @@
 
   .section{ margin-bottom:34px; }
   .section-head{
-    display:flex; align-items:center; justify-content:between;
-    gap:8px; margin-bottom:14px;
+    display:flex; align-items:center; gap:8px; margin-bottom:14px;
   }
   .section-head h3{ font-size:16px; font-weight:700; }
   .count-pill{
@@ -94,7 +91,6 @@
     margin-left:8px;
   }
 
-  /* ---------- Form card ---------- */
   .card{
     background:var(--card);
     border:1px solid var(--border);
@@ -157,7 +153,6 @@
   .banner.error{ background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#fca5a5; }
   .banner.success{ background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.3); color:#6ee7b7; }
 
-  /* ---------- List items ---------- */
   .list{ display:flex; flex-direction:column; gap:10px; }
   .item{
     background:var(--card); border:1px solid var(--border);
@@ -180,7 +175,6 @@
     border:1px dashed var(--border); border-radius:12px;
   }
 
-  /* ---------- Confirm modal ---------- */
   .modal-overlay{
     display:none; position:fixed; inset:0; background:rgba(5,8,16,.6);
     align-items:center; justify-content:center; z-index:50; padding:20px;
@@ -223,13 +217,11 @@
 
 <div class="container">
 
-  <!-- Auth gate -->
   <div class="gate" id="gate">
     <div class="spin"></div>
     <p>Checking access…</p>
   </div>
 
-  <!-- Main app, hidden until admin verified -->
   <div class="app" id="app">
 
     <div class="section">
@@ -279,7 +271,6 @@
   </div>
 </div>
 
-<!-- Delete confirm modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h4>Delete this project?</h4>
@@ -297,14 +288,12 @@ const client = supabase.createClient(
   "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
 );
 
-/* ---------- Escape helper (fixes XSS) ---------- */
 function esc(str){
   return String(str ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
   }[c]));
 }
 
-/* ---------- Banner helper ---------- */
 function showBanner(el, type, msg){
   el.className = "banner show " + type;
   el.textContent = msg;
@@ -314,12 +303,12 @@ function hideBanner(el){
   el.textContent = "";
 }
 
-/* ---------- SECURITY GATE (fixed: load only runs after admin confirmed) ---------- */
+/* ✅ FIXED: Redirects use "/" paths */
 async function checkAdminAndInit(){
   const { data: userData, error: userErr } = await client.auth.getUser();
 
   if(userErr || !userData.user){
-    window.location.href = "index.html";
+    window.location.href = "/";
     return;
   }
 
@@ -330,7 +319,7 @@ async function checkAdminAndInit(){
     .single();
 
   if(profileErr || !profile || profile.role !== "admin"){
-    window.location.href = "dashboard.html";
+    window.location.href = "/dashboard";
     return;
   }
 
@@ -341,13 +330,11 @@ async function checkAdminAndInit(){
 
 checkAdminAndInit();
 
-/* ---------------- LOAD ---------------- */
 async function load(){
   loadProjects();
   loadInterests();
 }
 
-/* ---------------- VALIDATION HELPERS ---------------- */
 function setError(inputId, errId, invalid){
   document.getElementById(inputId).classList.toggle("invalid", invalid);
   document.getElementById(errId).classList.toggle("show", invalid);
@@ -357,7 +344,6 @@ function setLoading(btn, loading){
   btn.disabled = loading;
 }
 
-/* ---------------- CREATE PROJECT ---------------- */
 const projectBanner = document.getElementById("projectBanner");
 
 document.getElementById("createBtn").addEventListener("click", async ()=>{
@@ -399,7 +385,6 @@ document.getElementById("createBtn").addEventListener("click", async ()=>{
   load();
 });
 
-/* ---------------- PROJECTS ---------------- */
 async function loadProjects(){
   const box = document.getElementById("projects");
   const { data, error } = await client.from("projects").select("*").order("created_at", { ascending:false });
@@ -436,7 +421,6 @@ async function loadProjects(){
   });
 }
 
-/* ---------------- DELETE (with confirmation, fixes accidental-delete bug) ---------------- */
 let pendingDeleteId = null;
 const modalOverlay = document.getElementById("modalOverlay");
 
@@ -460,7 +444,6 @@ document.getElementById("modalConfirm").addEventListener("click", async ()=>{
   load();
 });
 
-/* ---------------- INTERESTS ---------------- */
 async function loadInterests(){
   const box = document.getElementById("interests");
   const { data, error } = await client.from("interests").select("*");
@@ -515,13 +498,12 @@ async function loadInterests(){
   });
 }
 
-/* ---------------- LOGOUT ---------------- */
+/* ✅ FIXED: Logout redirect to "/" */
 document.getElementById("logoutBtn").addEventListener("click", async ()=>{
   await client.auth.signOut();
-  window.location.href = "index.html";
+  window.location.href = "/";
 });
 
-/* ---------------- Live re-validation ---------------- */
 ["title","description","budget"].forEach(id=>{
   document.getElementById(id).addEventListener("input", ()=>{
     document.getElementById(id).classList.remove("invalid");
