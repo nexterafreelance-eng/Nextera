@@ -153,6 +153,49 @@
     border-radius:999px;
   }
 
+  .services{
+    position:relative;
+    margin-top:26px;
+    padding-top:22px;
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+  .services-label{
+    display:block;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
+  .services-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .services-list li{
+    font-size:12.5px;
+    color:var(--text);
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    padding:6px 12px;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .services-list li::before{
+    content:"";
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    flex-shrink:0;
+  }
+
   /* ---------- Form panel ---------- */
   .panel{
     padding:44px 40px;
@@ -381,12 +424,23 @@
       NextEra
     </div>
     <div class="brand-copy">
-      <h1>Where clients, freelancers &amp; teams meet in one place.</h1>
-      <p>Sign in to manage projects, track work, and collaborate across your whole team — all from a single dashboard.</p>
+      <h1>Projects in. Quality work out.</h1>
+      <p>NextEra connects your project with the right freelancer or team — sign in to get started.</p>
       <div class="roles">
         <span class="role-chip">Client</span>
         <span class="role-chip">Freelancer</span>
         <span class="role-chip">Team Leader</span>
+      </div>
+
+      <div class="services">
+        <span class="services-label">Services we cover</span>
+        <ul class="services-list">
+          <li>Translation</li>
+          <li>Transcription</li>
+          <li>Recording projects</li>
+          <li>Dubbing</li>
+          <li>Data collection</li>
+        </ul>
       </div>
     </div>
   </div>
