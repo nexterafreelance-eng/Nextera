@@ -1,1 +1,155 @@
-</h1> Admin Panel</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NextEra Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#0b1220;
+color:white;
+}
+
+header{
+padding:15px;
+background:#111a33;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.container{
+padding:20px;
+}
+
+.box{
+background:#111a33;
+padding:15px;
+margin:10px 0;
+border-radius:10px;
+border:1px solid rgba(255,255,255,0.1);
+}
+
+button{
+padding:8px 12px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:#38bdf8;
+color:black;
+font-weight:bold;
+margin-top:5px;
+}
+
+button:hover{
+background:#22c55e;
+}
+
+h3{
+margin:0 0 10px 0;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>Admin Panel</h2>
+<button onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+
+<h3>📌 Projects</h3>
+<div id="projects"></div>
+
+<h3>🔥 Interests</h3>
+<div id="interests"></div>
+
+</div>
+
+<script>
+// Supabase connect
+const supabase = supabase.createClient(
+  "https://jnmjvjutyeruoowyrfgg.supabase.co",
+  "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
+);
+
+// LOAD DATA
+async function loadData(){
+loadProjects();
+loadInterests();
+}
+
+// PROJECTS
+async function loadProjects(){
+
+const { data } = await supabase.from("projects").select("*");
+
+let box = document.getElementById("projects");
+box.innerHTML = "";
+
+data.forEach(p => {
+
+let div = document.createElement("div");
+div.className = "box";
+
+div.innerHTML = `
+<h4>${p.title}</h4>
+<p>${p.description}</p>
+<p>Budget: ${p.budget}</p>
+`;
+
+box.appendChild(div);
+});
+}
+
+// INTERESTS
+async function loadInterests(){
+
+const { data } = await supabase.from("interests").select("*");
+
+let box = document.getElementById("interests");
+box.innerHTML = "";
+
+data.forEach(i => {
+
+let div = document.createElement("div");
+div.className = "box";
+
+div.innerHTML = `
+<p><b>Email:</b> ${i.user_email}</p>
+<p><b>Role:</b> ${i.role}</p>
+<p><b>Project ID:</b> ${i.project_id}</p>
+
+<button onclick="assign('${i.project_id}','${i.user_id}','${i.role}')">
+Assign Work
+</button>
+`;
+
+box.appendChild(div);
+});
+}
+
+// ASSIGN WORK
+async function assign(project_id, user_id, role){
+
+const { error } = await supabase
+.from("assignments")
+.insert([{
+project_id: project_id,
+assigned_to: user_id,
+assigned_role: role,
+status: "active"
+}]);
+
+if(error){
+alert(error.message);
+} else {
+alert("Work Assigned!");
+}
