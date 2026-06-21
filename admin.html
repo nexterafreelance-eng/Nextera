@@ -2,215 +2,532 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>NextEra Admin Panel - Secure</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>NextEra — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#0b1220;
-color:white;
-}
+  :root{
+    --bg:#0a0e1a;
+    --panel:#0e1426;
+    --card:#111a2e;
+    --field:#0b1120;
+    --border:#1f2a44;
+    --text:#e7ecf5;
+    --muted:#8b96ad;
+    --accent:#38bdf8;
+    --accent-2:#818cf8;
+    --error:#f87171;
+    --success:#34d399;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family:'Inter', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+  }
+  h1,h2,h3,h4{ font-family:'Sora', sans-serif; margin:0; }
 
-header{
-padding:15px;
-background:#111a33;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:10;
+    padding:16px 28px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{
+    width:32px; height:32px; border-radius:8px;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Sora'; font-weight:800; color:#06121f; font-size:14px;
+  }
+  .brand h2{ font-size:17px; font-weight:700; }
+  .brand span{ display:block; font-size:11.5px; color:var(--muted); font-weight:500; }
 
-.container{padding:20px;}
+  .logout-btn{
+    padding:9px 16px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text);
+    border-radius:8px;
+    font-family:'Inter'; font-weight:600; font-size:13px;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .logout-btn:hover{ border-color:var(--error); color:var(--error); }
 
-.box{
-background:#111a33;
-padding:15px;
-margin:10px 0;
-border-radius:10px;
-border:1px solid rgba(255,255,255,0.1);
-}
+  /* ---------- Layout ---------- */
+  .container{ max-width:1000px; margin:0 auto; padding:28px 24px 60px; }
 
-input{
-width:100%;
-padding:10px;
-margin:5px 0;
-border:none;
-border-radius:6px;
-}
+  .gate{
+    display:flex; align-items:center; justify-content:center;
+    min-height:70vh; flex-direction:column; gap:10px; color:var(--muted);
+  }
+  .gate .spin{
+    width:26px; height:26px; border:3px solid var(--border);
+    border-top-color:var(--accent); border-radius:50%;
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
 
-button{
-padding:8px 12px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-background:#38bdf8;
-color:black;
-font-weight:bold;
-margin-top:5px;
-}
+  .app{ display:none; }
+  .app.show{ display:block; }
+
+  .section{ margin-bottom:34px; }
+  .section-head{
+    display:flex; align-items:center; justify-content:between;
+    gap:8px; margin-bottom:14px;
+  }
+  .section-head h3{ font-size:16px; font-weight:700; }
+  .count-pill{
+    font-size:11.5px; color:var(--muted); background:var(--field);
+    border:1px solid var(--border); padding:2px 9px; border-radius:999px;
+    margin-left:8px;
+  }
+
+  /* ---------- Form card ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+  }
+
+  .field{ margin-bottom:12px; }
+  .field label{
+    display:block; font-size:12px; color:var(--muted);
+    margin-bottom:6px; font-weight:500;
+  }
+  input, textarea{
+    width:100%; padding:10px 12px;
+    font-family:'Inter'; font-size:14px;
+    background:var(--field); color:var(--text);
+    border:1px solid var(--border); border-radius:9px;
+    outline:none; resize:vertical;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  input:focus, textarea:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(56,189,248,.15);
+  }
+  input.invalid{ border-color:var(--error); }
+  .err-msg{ font-size:12px; color:var(--error); margin-top:4px; display:none; }
+  .err-msg.show{ display:block; }
+
+  .row-2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  .btn{
+    padding:10px 18px; border:none; border-radius:9px;
+    font-family:'Inter'; font-weight:700; font-size:13.5px;
+    cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+    transition:opacity .15s ease, transform .1s ease;
+  }
+  .btn:active{ transform:scale(.98); }
+  .btn-primary{ background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#06121f; }
+  .btn-primary:hover{ opacity:.92; }
+  .btn-primary:disabled{ opacity:.55; cursor:not-allowed; }
+  .btn-danger{
+    background:rgba(248,113,113,.12); color:#fca5a5;
+    border:1px solid rgba(248,113,113,.3);
+  }
+  .btn-danger:hover{ background:rgba(248,113,113,.2); }
+
+  .spinner-sm{
+    width:13px; height:13px; border:2px solid rgba(6,18,31,.3);
+    border-top-color:#06121f; border-radius:50%;
+    animation:spin .7s linear infinite; display:none;
+  }
+  .btn.loading .spinner-sm{ display:inline-block; }
+  .btn.loading .btn-text{ display:none; }
+
+  .banner{
+    display:none; font-size:13px; padding:10px 12px;
+    border-radius:9px; margin-bottom:14px; line-height:1.4;
+  }
+  .banner.show{ display:block; }
+  .banner.error{ background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#fca5a5; }
+  .banner.success{ background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.3); color:#6ee7b7; }
+
+  /* ---------- List items ---------- */
+  .list{ display:flex; flex-direction:column; gap:10px; }
+  .item{
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:16px 18px;
+  }
+  .item h4{ font-size:14.5px; font-weight:700; margin-bottom:4px; }
+  .item p{ font-size:13px; color:var(--muted); margin:2px 0; line-height:1.5; }
+  .item p b{ color:var(--text); font-weight:600; }
+  .item-foot{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:10px; flex-wrap:wrap; gap:8px;
+  }
+  .budget-tag{
+    font-size:12.5px; font-weight:700; color:var(--accent);
+    background:rgba(56,189,248,.1); padding:3px 10px; border-radius:999px;
+  }
+
+  .empty{
+    text-align:center; padding:30px 14px; color:var(--muted); font-size:13.5px;
+    border:1px dashed var(--border); border-radius:12px;
+  }
+
+  /* ---------- Confirm modal ---------- */
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(5,8,16,.6);
+    align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal{
+    background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:22px; max-width:360px; width:100%;
+  }
+  .modal h4{ font-size:15px; margin-bottom:8px; }
+  .modal p{ font-size:13px; color:var(--muted); margin-bottom:18px; line-height:1.5; }
+  .modal-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .btn-ghost{
+    background:transparent; border:1px solid var(--border); color:var(--text);
+  }
+  .btn-ghost:hover{ border-color:var(--muted); }
+
+  @media (max-width:600px){
+    .row-2{ grid-template-columns:1fr; }
+    header{ padding:14px 18px; }
+    .container{ padding:22px 16px 50px; }
+  }
+
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
 </style>
 </head>
 
 <body>
 
 <header>
-<h2>Admin Dashboard</h2>
-<button onclick="logout()">Logout</button>
+  <div class="brand">
+    <div class="logo-mark">NE</div>
+    <div>
+      <h2>NextEra</h2>
+      <span>Admin dashboard</span>
+    </div>
+  </div>
+  <button class="logout-btn" id="logoutBtn">Log out</button>
 </header>
 
 <div class="container">
 
-<h3>➕ Create New Project</h3>
-<div class="box">
-<input id="title" placeholder="Project Title">
-<input id="description" placeholder="Project Description">
-<input id="budget" placeholder="Budget">
-<button onclick="createProject()">Post Project</button>
+  <!-- Auth gate -->
+  <div class="gate" id="gate">
+    <div class="spin"></div>
+    <p>Checking access…</p>
+  </div>
+
+  <!-- Main app, hidden until admin verified -->
+  <div class="app" id="app">
+
+    <div class="section">
+      <div class="section-head"><h3>Create new project</h3></div>
+      <div class="card">
+        <div class="banner" id="projectBanner"></div>
+
+        <div class="field">
+          <label for="title">Project title</label>
+          <input id="title" placeholder="e.g. Brand redesign for fintech app">
+          <div class="err-msg" id="titleErr">Enter a project title.</div>
+        </div>
+
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea id="description" rows="3" placeholder="What does this project involve?"></textarea>
+          <div class="err-msg" id="descriptionErr">Enter a project description.</div>
+        </div>
+
+        <div class="field">
+          <label for="budget">Budget (USD)</label>
+          <input id="budget" type="number" min="0" step="1" placeholder="e.g. 500">
+          <div class="err-msg" id="budgetErr">Enter a valid budget amount.</div>
+        </div>
+
+        <button class="btn btn-primary" id="createBtn">
+          <span class="spinner-sm"></span>
+          <span class="btn-text">Post project</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h3>Projects <span class="count-pill" id="projectCount">0</span></h3>
+      </div>
+      <div class="list" id="projects"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h3>Interests <span class="count-pill" id="interestCount">0</span></h3>
+      </div>
+      <div class="list" id="interests"></div>
+    </div>
+
+  </div>
 </div>
 
-<h3>📌 Projects</h3>
-<div id="projects"></div>
-
-<h3>🔥 Interests</h3>
-<div id="interests"></div>
-
+<!-- Delete confirm modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h4>Delete this project?</h4>
+    <p>This can't be undone. The project and its listing will be removed immediately.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modalCancel">Cancel</button>
+      <button class="btn btn-danger" id="modalConfirm">Delete</button>
+    </div>
+  </div>
 </div>
 
 <script>
 const client = supabase.createClient(
-"https://jnmjvjutyeruoowyrfgg.supabase.co",
-"sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
+  "https://jnmjvjutyeruoowyrfgg.supabase.co",
+  "sb_publishable_VcImT89uqQK1JnyJn1Xdug_9Uoa7I_f"
 );
 
-/* ---------------- SECURITY CHECK ---------------- */
-async function checkAdmin(){
-
-const { data: userData } = await client.auth.getUser();
-
-if(!userData.user){
-window.location.href = "index.html";
-return;
+/* ---------- Escape helper (fixes XSS) ---------- */
+function esc(str){
+  return String(str ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[c]));
 }
 
-const { data: profile } = await client
-.from("profiles")
-.select("*")
-.eq("id", userData.user.id)
-.single();
-
-if(!profile || profile.role !== "admin"){
-alert("Access Denied!");
-window.location.href = "dashboard.html";
+/* ---------- Banner helper ---------- */
+function showBanner(el, type, msg){
+  el.className = "banner show " + type;
+  el.textContent = msg;
 }
+function hideBanner(el){
+  el.className = "banner";
+  el.textContent = "";
 }
 
-checkAdmin();
+/* ---------- SECURITY GATE (fixed: load only runs after admin confirmed) ---------- */
+async function checkAdminAndInit(){
+  const { data: userData, error: userErr } = await client.auth.getUser();
+
+  if(userErr || !userData.user){
+    window.location.href = "index.html";
+    return;
+  }
+
+  const { data: profile, error: profileErr } = await client
+    .from("profiles")
+    .select("*")
+    .eq("id", userData.user.id)
+    .single();
+
+  if(profileErr || !profile || profile.role !== "admin"){
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  document.getElementById("gate").style.display = "none";
+  document.getElementById("app").classList.add("show");
+  load();
+}
+
+checkAdminAndInit();
 
 /* ---------------- LOAD ---------------- */
 async function load(){
-loadProjects();
-loadInterests();
+  loadProjects();
+  loadInterests();
+}
+
+/* ---------------- VALIDATION HELPERS ---------------- */
+function setError(inputId, errId, invalid){
+  document.getElementById(inputId).classList.toggle("invalid", invalid);
+  document.getElementById(errId).classList.toggle("show", invalid);
+}
+function setLoading(btn, loading){
+  btn.classList.toggle("loading", loading);
+  btn.disabled = loading;
 }
 
 /* ---------------- CREATE PROJECT ---------------- */
-async function createProject(){
+const projectBanner = document.getElementById("projectBanner");
 
-let title = document.getElementById("title").value;
-let description = document.getElementById("description").value;
-let budget = document.getElementById("budget").value;
+document.getElementById("createBtn").addEventListener("click", async ()=>{
+  hideBanner(projectBanner);
 
-const { error } = await client
-.from("projects")
-.insert([{ title, description, budget }]);
+  const title = document.getElementById("title").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const budgetRaw = document.getElementById("budget").value;
+  const budget = Number(budgetRaw);
 
-if(error){
-alert(error.message);
-} else {
-alert("Project Created!");
-load();
-}
-}
+  const titleValid = title.length > 1;
+  const descValid = description.length > 1;
+  const budgetValid = budgetRaw !== "" && !isNaN(budget) && budget >= 0;
+
+  setError("title","titleErr", !titleValid);
+  setError("description","descriptionErr", !descValid);
+  setError("budget","budgetErr", !budgetValid);
+
+  if(!titleValid || !descValid || !budgetValid) return;
+
+  const btn = document.getElementById("createBtn");
+  setLoading(btn, true);
+
+  const { error } = await client
+    .from("projects")
+    .insert([{ title, description, budget }]);
+
+  setLoading(btn, false);
+
+  if(error){
+    showBanner(projectBanner, "error", error.message);
+    return;
+  }
+
+  showBanner(projectBanner, "success", "Project posted.");
+  document.getElementById("title").value = "";
+  document.getElementById("description").value = "";
+  document.getElementById("budget").value = "";
+  load();
+});
 
 /* ---------------- PROJECTS ---------------- */
 async function loadProjects(){
+  const box = document.getElementById("projects");
+  const { data, error } = await client.from("projects").select("*").order("created_at", { ascending:false });
 
-const { data } = await client.from("projects").select("*");
+  if(error){
+    box.innerHTML = <div class="empty">Couldn't load projects: ${esc(error.message)}</div>;
+    return;
+  }
 
-let box = document.getElementById("projects");
-box.innerHTML = "";
+  document.getElementById("projectCount").textContent = data.length;
 
-data.forEach(p => {
+  if(data.length === 0){
+    box.innerHTML = <div class="empty">No projects posted yet. Create one above.</div>;
+    return;
+  }
 
-let div = document.createElement("div");
-div.className = "box";
+  box.innerHTML = "";
+  data.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <h4>${esc(p.title)}</h4>
+      <p>${esc(p.description)}</p>
+      <div class="item-foot">
+        <span class="budget-tag">$${esc(p.budget)}</span>
+        <button class="btn btn-danger" data-delete-id="${esc(p.id)}">Delete</button>
+      </div>
+    `;
+    box.appendChild(div);
+  });
 
-div.innerHTML = `
-<h4>${p.title}</h4>
-<p>${p.description}</p>
-<p><b>Budget:</b> ${p.budget}</p>
-<button onclick="deleteProject('${p.id}')">Delete</button>
-`;
+  box.querySelectorAll("[data-delete-id]").forEach(b=>{
+    b.addEventListener("click", ()=> openDeleteModal(b.getAttribute("data-delete-id")));
+  });
+}
 
-box.appendChild(div);
+/* ---------------- DELETE (with confirmation, fixes accidental-delete bug) ---------------- */
+let pendingDeleteId = null;
+const modalOverlay = document.getElementById("modalOverlay");
+
+function openDeleteModal(id){
+  pendingDeleteId = id;
+  modalOverlay.classList.add("show");
+}
+document.getElementById("modalCancel").addEventListener("click", ()=>{
+  pendingDeleteId = null;
+  modalOverlay.classList.remove("show");
 });
-}
-
-async function deleteProject(id){
-
-await client.from("projects").delete().eq("id", id);
-load();
-}
+document.getElementById("modalConfirm").addEventListener("click", async ()=>{
+  if(!pendingDeleteId) return;
+  const { error } = await client.from("projects").delete().eq("id", pendingDeleteId);
+  modalOverlay.classList.remove("show");
+  pendingDeleteId = null;
+  if(error){
+    showBanner(projectBanner, "error", error.message);
+    return;
+  }
+  load();
+});
 
 /* ---------------- INTERESTS ---------------- */
 async function loadInterests(){
+  const box = document.getElementById("interests");
+  const { data, error } = await client.from("interests").select("*");
 
-const { data } = await client.from("interests").select("*");
+  if(error){
+    box.innerHTML = <div class="empty">Couldn't load interests: ${esc(error.message)}</div>;
+    return;
+  }
 
-let box = document.getElementById("interests");
-box.innerHTML = "";
+  document.getElementById("interestCount").textContent = data.length;
 
-data.forEach(i => {
+  if(data.length === 0){
+    box.innerHTML = <div class="empty">No interests submitted yet.</div>;
+    return;
+  }
 
-let div = document.createElement("div");
-div.className = "box";
+  box.innerHTML = "";
+  data.forEach(i => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <p><b>Email:</b> ${esc(i.user_email)}</p>
+      <p><b>Role:</b> ${esc(i.role)}</p>
+      <p><b>Project ID:</b> ${esc(i.project_id)}</p>
+      <div class="item-foot">
+        <button class="btn btn-primary" data-assign='${esc(JSON.stringify({p:i.project_id,u:i.user_id,r:i.role}))}'>
+          <span class="spinner-sm"></span>
+          <span class="btn-text">Assign work</span>
+        </button>
+      </div>
+    `;
+    box.appendChild(div);
+  });
 
-div.innerHTML = `
-<p><b>Email:</b> ${i.user_email}</p>
-<p><b>Role:</b> ${i.role}</p>
-<p><b>Project ID:</b> ${i.project_id}</p>
-
-<button onclick="assignWork('${i.project_id}','${i.user_id}','${i.role}')">
-Assign Work
-</button>
-`;
-
-box.appendChild(div);
-});
-}
-
-/* ---------------- ASSIGN WORK ---------------- */
-async function assignWork(project_id, user_id, role){
-
-await client.from("assignments").insert([{
-project_id,
-assigned_to: user_id,
-assigned_role: role,
-status: "active"
-}]);
-
-alert("Work Assigned!");
+  box.querySelectorAll("[data-assign]").forEach(b=>{
+    b.addEventListener("click", async ()=>{
+      const { p, u, r } = JSON.parse(b.getAttribute("data-assign"));
+      setLoading(b, true);
+      const { error } = await client.from("assignments").insert([{
+        project_id: p,
+        assigned_to: u,
+        assigned_role: r,
+        status: "active"
+      }]);
+      setLoading(b, false);
+      if(error){
+        alert(error.message);
+      } else {
+        b.outerHTML = <span class="budget-tag">Assigned ✓</span>;
+      }
+    });
+  });
 }
 
 /* ---------------- LOGOUT ---------------- */
-async function logout(){
-await client.auth.signOut();
-window.location.href = "index.html";
-}
+document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+  await client.auth.signOut();
+  window.location.href = "index.html";
+});
 
-load();
+/* ---------------- Live re-validation ---------------- */
+["title","description","budget"].forEach(id=>{
+  document.getElementById(id).addEventListener("input", ()=>{
+    document.getElementById(id).classList.remove("invalid");
+    document.getElementById(id+"Err").classList.remove("show");
+  });
+});
 </script>
 
 </body>
